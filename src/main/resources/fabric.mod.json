@@ -1,0 +1,31 @@
+{
+	"schemaVersion": 1,
+	"id": "afkminus",
+	"version": "${version}",
+	"name": "AfkMinus",
+	"description": "A small placeholder afk mod for players who haven't moved in a while.",
+	"authors": [
+		"Oxtaly"
+	],
+	"contact": {
+		"homepage": "https://github.com/Oxtaly/CarpetBotPlaceholders",
+		"sources": "https://github.com/Oxtaly/CarpetBotPlaceholders"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/afkminus/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.oxtaly.afkminus.AfkMinus"
+		]
+	},
+	"mixins": [
+		"afkminus.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.16.9",
+		"minecraft": ">=1.21.4",
+		"java": ">=21",
+		"fabric-api": "*"
+	}
+}
