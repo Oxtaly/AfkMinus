@@ -28,7 +28,7 @@ public class  ServerPlayerEntityMixin {
         afkPlayer.setForcedAfk(false);
     }
 
-    @Inject(method = "<init>()V", at = @At("RETURN"))
+    @Inject(method = "<init>(Lnet/minecraft/server/MinecraftServer;Lnet/minecraft/server/world/ServerWorld;Lcom/mojang/authlib/GameProfile;Lnet/minecraft/network/packet/c2s/common/SyncedClientOptions;)V", at = @At("RETURN"))
     public void onCreate(CallbackInfo ci) {
         ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
         if(player == null) {

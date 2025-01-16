@@ -292,7 +292,7 @@ public final class ModCommands {
             }
             source.sendFeedback(() -> Utils.minecraftLogBuilder.log("")
                 .append(target.getDisplayName())
-                .append(String.format(" has been afk for %sms", Util.getEpochTimeMs() - afkPlayer.getLastInputTime() - AfkMinus.CONFIG_MANAGER.getData().timeUntilAfk)),
+                .append(String.format(" has been afk for %sms", Util.getEpochTimeMs() - afkPlayer.getLastInputTime() - AfkMinus.CONFIG_MANAGER.getData().timeUntilAfk*1000)),
             false);
             return 1;
         } catch (Exception e) {
