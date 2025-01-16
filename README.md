@@ -4,7 +4,7 @@
     <img alt="Carpet Bot Placeholder" height="256" src="./src/main/resources/assets/afkminus/icon.png" title="Mod Icon" width="256"/>
 </p>
 
-## This is a pretty simple fabric mod that adds a configurable placeholder for players that haven't moved in a while
+## This is a pretty simple fabric mod that adds a configurable placeholder for players that haven't moved in a while, inspired by the [AfkPlus](https://modrinth.com/mod/afkplus) mod
 
 ** **
 ## Placeholder
