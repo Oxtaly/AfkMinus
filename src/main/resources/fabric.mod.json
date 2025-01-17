@@ -5,11 +5,11 @@
 	"name": "AfkMinus",
 	"description": "A small placeholder afk mod for players who haven't moved in a while.",
 	"authors": [
-		"Oxtaly"
+		"@Oxtaly"
 	],
 	"contact": {
-		"homepage": "https://github.com/Oxtaly/CarpetBotPlaceholders",
-		"sources": "https://github.com/Oxtaly/CarpetBotPlaceholders"
+		"homepage": "https://github.com/Oxtaly/AfkMinus",
+		"sources": "https://github.com/Oxtaly/AfkMinus"
 	},
 	"license": "CC0-1.0",
 	"icon": "assets/afkminus/icon.png",
