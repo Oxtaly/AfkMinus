@@ -48,13 +48,16 @@ Additionally, you can use it for command blocks/datapacks like so `/execute stor
 
 ** **
 ## Permissions
-Base command (`/afkminus`) requires `afkminus.command.afkminus.base` or at least permission level 2 to see/use sub commands
-Sub-Base command (`/afkminus config`) requires `afkminus.command.afkminus.config.base` or at least permission level 4 to see/use sub commands
-Sub-Base command (`/afkminus config set`) requires `afkminus.command.afkminus.config.set.base` or at least permission level 4 to see/use sub commands
+### Command/Sub-commands base permissions required to see/use sub-commands
+Base command (`/afkminus`) requires `afkminus.command.afkminus.base` or at least permission level 2<br>
+Subcommand `/afkminus config` requires `afkminus.command.afkminus.config.base` or at least permission level 4<br>
+Subcommand `/afkminus config set` requires `afkminus.command.afkminus.config.set.base` or at least permission level 4
+
+### Subcommand specifc permissions
 
 `/afkminus config reload` - `afkminus.command.afkminus.config.reload` || Permission level 4<br>
 `/afkminus config set <key> <value>` - `afkminus.command.afkminus.config.set` || Permission level 4<br>
-    **- Can be additionally restricted with `afkminus.command.afkminus.config.set.<config_value>`, for example with `afkminus.command.afkminus.config.set.time_until_afk`, a player can only edit the time until afk**
+ - Can be additionally restricted with `afkminus.command.afkminus.config.set.<config_value>`, for example with `afkminus.command.afkminus.config.set.time_until_afk`, a player can only edit the time until afk
 
 
 `/afkminus force <player(s)>` - `afkminus.command.afkminus.force` || Permission level 2<br>
