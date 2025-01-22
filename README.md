@@ -26,7 +26,7 @@ The `afk_placeholder` config values use [Simplified Text Format](https://placeho
     "afk_placeholder": "<i><dark_gray>[<gray>AFK</gray>]</dark_gray></i> ",
     "time_until_afk": 300, 
     "add_tag_on_afk": true,
-    "tag_on_afk": "afkminus.afk"
+    "afk_tag": "afkminus.afk"
 }
 ```
 
