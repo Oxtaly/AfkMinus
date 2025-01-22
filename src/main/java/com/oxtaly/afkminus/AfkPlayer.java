@@ -1,5 +1,6 @@
 package com.oxtaly.afkminus;
 
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import org.jetbrains.annotations.Contract;
@@ -10,13 +11,14 @@ import java.util.UUID;
 
 public class AfkPlayer {
     private long lastInputTime = Util.getEpochTimeMs();
-    private final UUID uuid;
+    private final ServerPlayerEntity player;
     private boolean forcedAfk = false;
     private Text forcedAfkSource = null;
     private long forcedAfkTime = 0;
+    private boolean hasAfkTag = false;
 
-    public UUID getUuid() {
-        return uuid;
+    public ServerPlayerEntity getPlayer() {
+        return player;
     }
 
     public long getLastInputTime() {
@@ -49,6 +51,13 @@ public class AfkPlayer {
         this.forcedAfkTime = Util.getEpochTimeMs();
     }
 
+    public boolean hasAfkTag() {
+        return hasAfkTag;
+    }
+
+    public void setHasAfkTag(boolean hasAfkTag) {
+        this.hasAfkTag = hasAfkTag;
+    }
 
     public boolean isAfk() {
         long timeUntilAfk = (long) AfkMinus.CONFIG_MANAGER.getData().timeUntilAfk;
@@ -59,12 +68,12 @@ public class AfkPlayer {
         return naturallyAfk || this.isForcedAfk();
     }
 
-    public AfkPlayer(UUID uuid) {
-        this.uuid = uuid;
+    private AfkPlayer(ServerPlayerEntity player) {
+        this.player = player;
     }
 
     @Contract("_ -> new")
-    public static @NotNull AfkPlayer fromUUID(UUID uuid) {
-        return new AfkPlayer(uuid);
+    public static @NotNull AfkPlayer fromPlayer(ServerPlayerEntity player) {
+        return new AfkPlayer(player);
     }
 }

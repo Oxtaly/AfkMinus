@@ -1,6 +1,7 @@
 package com.oxtaly.afkminus.commands;
 
 import com.google.gson.JsonIOException;
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.tree.LiteralCommandNode;
@@ -16,6 +17,8 @@ import com.oxtaly.afkminus.utils.Utils;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.HoverEvent;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import org.jetbrains.annotations.NotNull;
@@ -33,9 +36,60 @@ public final class ModCommands {
             final LiteralCommandNode<ServerCommandSource> node = dispatcher.register(
                 CommandManager.literal("afkminus")
                     .requires(source -> Permissions.check(source, "afkminus.command.afkminus.base", 2))
-                    .then(CommandManager.literal("reload")
-                            .requires(source -> Permissions.check(source, "afkminus.command.afkminus.reload", 4))
-                            .executes(ctx -> reloadConfig(ctx.getSource()))
+                    .then(CommandManager.literal("config")
+                            .requires(source -> Permissions.check(source, "afkminus.command.afkminus.config.base", 4))
+                            .then(CommandManager.literal("reload")
+                                    .requires(source -> Permissions.check(source, "afkminus.command.afkminus.config.reload", 4))
+                                    .executes(ctx -> reloadConfig(ctx.getSource()))
+                            )
+                            .then(CommandManager.literal("set")
+                                    .requires(source -> Permissions.check(source, "afkminus.command.afkminus.config.set.base", 4))
+                                    .then(CommandManager.literal("time_until_afk")
+                                            .requires(source -> Permissions.check(source, "afkminus.command.afkminus.config.set.time_until_afk", 4))
+                                            .then(CommandManager.argument("value", IntegerArgumentType.integer(-1, 2147483647))
+                                                    .suggests((ctx, builder) -> {
+                                                        builder.suggest(-1);
+                                                        builder.suggest(ConfigData.DEFAULT.timeUntilAfk);
+                                                        builder.suggest(AfkMinus.CONFIG_MANAGER.getData().timeUntilAfk);
+                                                        return builder.buildFuture();
+                                                    })
+                                                    .executes(ctx -> setTimeUntilAfk(ctx.getSource(), IntegerArgumentType.getInteger(ctx, "value")))
+                                            )
+                                    )
+                                    .then(CommandManager.literal("afk_placeholder")
+                                            .requires(source -> Permissions.check(source, "afkminus.command.afkminus.config.set.afk_placeholder", 4))
+                                            .then(CommandManager.argument("value", StringArgumentType.string())
+                                                    .suggests((ctx, builder) -> {
+                                                        builder.suggest("\"" + ConfigData.DEFAULT.afkPlaceholder + "\"");
+                                                        builder.suggest("\"" + AfkMinus.CONFIG_MANAGER.getData().afkPlaceholder + "\"");
+                                                        return builder.buildFuture();
+                                                    })
+                                                    .executes(ctx -> setAfkPlaceholder(ctx.getSource(), StringArgumentType.getString(ctx, "value")))
+                                            )
+                                    )
+                                    .then(CommandManager.literal("add_tag_on_afk")
+                                            .requires(source -> Permissions.check(source, "afkminus.command.afkminus.config.set.add_tag_on_afk", 4))
+                                            .then(CommandManager.argument("value", BoolArgumentType.bool())
+                                                    .suggests((ctx, builder) -> {
+                                                        builder.suggest(String.valueOf(ConfigData.DEFAULT.addTagOnAfk));
+                                                        builder.suggest(String.valueOf(AfkMinus.CONFIG_MANAGER.getData().addTagOnAfk));
+                                                        return builder.buildFuture();
+                                                    })
+                                                    .executes(ctx -> setAddTagOnAfk(ctx.getSource(), BoolArgumentType.getBool(ctx, "value")))
+                                            )
+                                    )
+                                    .then(CommandManager.literal("afk_tag")
+                                            .requires(source -> Permissions.check(source, "afkminus.command.afkminus.config.set.afk_tag", 4))
+                                            .then(CommandManager.argument("value", StringArgumentType.string())
+                                                    .suggests((ctx, builder) -> {
+                                                        builder.suggest("\"" + ConfigData.DEFAULT.afkTag + "\"");
+                                                        builder.suggest("\"" + AfkMinus.CONFIG_MANAGER.getData().afkTag + "\"");
+                                                        return builder.buildFuture();
+                                                    })
+                                                    .executes(ctx -> setAfkTag(ctx.getSource(), StringArgumentType.getString(ctx, "value")))
+                                            )
+                                    )
+                            )
                     )
                     .then(CommandManager.literal("force")
                             .requires(source -> Permissions.check(source, "afkminus.command.afkminus.force", 2))
@@ -79,39 +133,13 @@ public final class ModCommands {
                                     .executes(ctx -> getAfkStatus(ctx.getSource(), EntityArgumentType.getPlayer(ctx, "player")))
                             )
                     )
-                    .then(CommandManager.literal("set")
-                            .requires(source -> Permissions.check(source, "afkminus.command.afkminus.set", 4))
-                            .then(CommandManager.literal("time_until_afk")
-                                    .requires(source -> Permissions.check(source, "afkminus.command.afkminus.set.time_until_afk", 4))
-                                    .then(CommandManager.argument("value", IntegerArgumentType.integer(-1, 2147483647))
-                                            .suggests((ctx, builder) -> {
-                                                builder.suggest(-1);
-                                                builder.suggest(ConfigData.DEFAULT.timeUntilAfk);
-                                                builder.suggest(AfkMinus.CONFIG_MANAGER.getData().timeUntilAfk);
-                                                return builder.buildFuture();
-                                            })
-                                            .executes(ctx -> setTimeUntilAfk(ctx.getSource(), IntegerArgumentType.getInteger(ctx, "value")))
-                                    )
-                            )
-                            .then(CommandManager.literal("afk_placeholder")
-                                    .requires(source -> Permissions.check(source, "afkminus.command.afkminus.set.afk_placeholder", 4))
-                                    .then(CommandManager.argument("value", StringArgumentType.string())
-                                            .suggests((ctx, builder) -> {
-                                                builder.suggest("\"" + ConfigData.DEFAULT.afkPlaceholder + "\"");
-                                                builder.suggest("\"" + AfkMinus.CONFIG_MANAGER.getData().afkPlaceholder + "\"");
-                                                return builder.buildFuture();
-                                            })
-                                            .executes(ctx -> setAfkPlaceholder(ctx.getSource(), StringArgumentType.getString(ctx, "value")))
-                                    )
-                            )
-                    )
             );
         });
     }
     public static int reloadConfig(ServerCommandSource source) {
         try {
             ConfigData oldConfigData = AfkMinus.CONFIG_MANAGER.getData().clone();
-            int returnCode = Utils.innitConfig();
+            int returnCode = Utils.initConfig();
             if(returnCode > 0) {
                 AfkMinus.CONFIG_MANAGER.setData(oldConfigData);
                 source.sendError(Utils.minecraftLogBuilder.error("An error happened trying reload config!"));
@@ -152,7 +180,6 @@ public final class ModCommands {
             return 0;
         }
     }
-
     public static int setTimeUntilAfk(ServerCommandSource source, @NotNull Integer value) {
         try {
             AfkMinus.CONFIG_MANAGER.getData().timeUntilAfk = value;
@@ -170,6 +197,46 @@ public final class ModCommands {
         } catch (Exception e) {
             source.sendError(Utils.minecraftLogBuilder.error("An error happened running the command! Check the console for more details."));
             AfkMinus.LOGGER.error("An error running setTimeUntilAfk command!", e);
+            return 0;
+        }
+    }
+    public static int setAfkTag(ServerCommandSource source, @NotNull String value) {
+        try {
+            AfkMinus.CONFIG_MANAGER.getData().afkTag = value;
+            Utils.saveConfig();
+            source.sendFeedback(() -> Utils.minecraftLogBuilder.log(String.format("Set new afk_tag to %s", value)), true);
+            return 1;
+        } catch (JsonIOException e) {
+            source.sendError(Utils.minecraftLogBuilder.error("An error happened converting config to json! Check the console for more details."));
+            AfkMinus.LOGGER.error("An error converting config to json in afkTag command!", e);
+            return 0;
+        } catch (IOException e) {
+            source.sendError(Utils.minecraftLogBuilder.error("An error happened saving the config file! Check the console for more details."));
+            AfkMinus.LOGGER.error("An error saving config file in afkTag command!", e);
+            return 0;
+        } catch (Exception e) {
+            source.sendError(Utils.minecraftLogBuilder.error("An error happened running the command! Check the console for more details."));
+            AfkMinus.LOGGER.error("An error running afkTag command!", e);
+            return 0;
+        }
+    }
+    public static int setAddTagOnAfk(ServerCommandSource source, @NotNull Boolean value) {
+        try {
+            AfkMinus.CONFIG_MANAGER.getData().addTagOnAfk = value;
+            Utils.saveConfig();
+            source.sendFeedback(() -> Utils.minecraftLogBuilder.log(String.format("Set new add_tag_on_afk to %s", value)), true);
+            return 1;
+        } catch (JsonIOException e) {
+            source.sendError(Utils.minecraftLogBuilder.error("An error happened converting config to json! Check the console for more details."));
+            AfkMinus.LOGGER.error("An error converting config to json in addTagOnAfk command!", e);
+            return 0;
+        } catch (IOException e) {
+            source.sendError(Utils.minecraftLogBuilder.error("An error happened saving the config file! Check the console for more details."));
+            AfkMinus.LOGGER.error("An error saving config file in addTagOnAfk command!", e);
+            return 0;
+        } catch (Exception e) {
+            source.sendError(Utils.minecraftLogBuilder.error("An error happened running the command! Check the console for more details."));
+            AfkMinus.LOGGER.error("An error running addTagOnAfk command!", e);
             return 0;
         }
     }
@@ -260,7 +327,6 @@ public final class ModCommands {
         }
     }
 
-    //TODO: format the time instead of giving it in ms
     public static int getAfkStatus(ServerCommandSource source, @NotNull final ServerPlayerEntity target) {
         try {
             if(target == null) {
@@ -282,17 +348,29 @@ public final class ModCommands {
                 return 0;
             }
             if(afkPlayer.isForcedAfk()) {
+                long afkTime = Util.getEpochTimeMs() - afkPlayer.getForcedAfkTime();
                 source.sendFeedback(() -> Utils.minecraftLogBuilder.log("")
                     .append(target.getDisplayName())
                     .append(" has been forced afk by ")
                     .append(afkPlayer.getForcedAfkSource())
-                    .append(String.format(" for %sms", Util.getEpochTimeMs() - afkPlayer.getForcedAfkTime())),
+                    .append(" for ")
+                    .append(
+                        Text.literal(Utils.msToHighest2(afkTime))
+                            .setStyle(Style.EMPTY.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(afkTime + "ms")))
+                        )
+                    ),
                 false);
                 return 1;
             }
+            long afkTime = Util.getEpochTimeMs() - afkPlayer.getLastInputTime() - AfkMinus.CONFIG_MANAGER.getData().timeUntilAfk*1000;
             source.sendFeedback(() -> Utils.minecraftLogBuilder.log("")
                 .append(target.getDisplayName())
-                .append(String.format(" has been afk for %sms", Util.getEpochTimeMs() - afkPlayer.getLastInputTime() - AfkMinus.CONFIG_MANAGER.getData().timeUntilAfk*1000)),
+                .append(" has been afk for ")
+                .append(
+                    Text.literal(Utils.msToHighest2(afkTime))
+                        .setStyle(Style.EMPTY.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(afkTime + "ms")))
+                    )
+                ),
             false);
             return 1;
         } catch (Exception e) {

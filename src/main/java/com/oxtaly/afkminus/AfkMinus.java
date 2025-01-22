@@ -30,9 +30,11 @@ public class AfkMinus implements ModInitializer {
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
 		try {
-			Utils.innitConfig();
+			Utils.initConfig();
+			Utils.saveConfig();
 			ModCommands.init();
 			AfkMinusPlaceHolders.register();
+			Utils.initEvents();
 			LOGGER.info("[AfkMinus] Loaded!");
 		} catch (IOException e) {
 			LOGGER.error("[AfkMinus] An error happened trying to load config!", e);

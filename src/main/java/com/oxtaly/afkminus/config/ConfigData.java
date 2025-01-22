@@ -15,13 +15,19 @@ public class ConfigData implements Cloneable {
     public String afkPlaceholder;
     @SerializedName("time_until_afk")
     public Integer timeUntilAfk;
+    @SerializedName("add_tag_on_afk")
+    public Boolean addTagOnAfk;
+    @SerializedName("afk_tag")
+    public String afkTag;
 
     public static @NotNull ConfigData createDefault() {
         ConfigData configData = new ConfigData();
 
-        configData.configVersion = "1.0.0";
+        configData.configVersion = "1.0.1";
         configData.afkPlaceholder = "<i><dark_gray>[<gray>AFK</gray>]</dark_gray></i> ";
         configData.timeUntilAfk = 300;
+        configData.addTagOnAfk = true;
+        configData.afkTag = "afkminus.afk";
 
         return configData;
     }
@@ -30,6 +36,8 @@ public class ConfigData implements Cloneable {
         this.configVersion = requireNonNullElse(this.configVersion, DEFAULT.configVersion);
         this.afkPlaceholder = requireNonNullElse(this.afkPlaceholder, DEFAULT.afkPlaceholder);
         this.timeUntilAfk = requireNonNullElse(this.timeUntilAfk, DEFAULT.timeUntilAfk);
+        this.addTagOnAfk = requireNonNullElse(this.addTagOnAfk, DEFAULT.addTagOnAfk);
+        this.afkTag = requireNonNullElse(this.afkTag, DEFAULT.afkTag);
     }
 
     public ConfigData clone() {

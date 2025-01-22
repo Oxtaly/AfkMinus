@@ -2,6 +2,7 @@ package com.oxtaly.afkminus.utils;
 
 import com.oxtaly.afkminus.AfkMinus;
 import com.oxtaly.afkminus.config.ConfigManager;
+import com.oxtaly.afkminus.listeners.TickEventListener;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
@@ -47,7 +48,7 @@ public class Utils {
         };
     }
 
-    public static int innitConfig() throws IOException {
+    public static int initConfig() throws IOException {
         ConfigManager config = AfkMinus.CONFIG_MANAGER;
         File configFile = new File(getConfigPath());
         if(!configFile.exists()) {
@@ -61,5 +62,37 @@ public class Utils {
         ConfigManager config = AfkMinus.CONFIG_MANAGER;
         File configFile = new File(getConfigPath());
         config.writeConfig(configFile);
+    }
+
+    public static void initEvents() {
+        TickEventListener.register();
+    }
+
+    public static String msToHighest2(long ms) {
+        long rest = ms;
+
+        int milliseconds = (int) (ms % 1000);
+        rest = (rest - milliseconds) / 1000;
+
+        int seconds = (int) (rest % 60);
+        rest = (rest - seconds) / 60;
+
+        int minutes = (int) (rest % 60);
+        rest = (rest - minutes) / 60;
+
+        int hours = (int) (rest % 24);
+        rest = (rest - hours) / 24;
+
+        int days = (int) rest;
+
+        if(days != 0)
+            return String.format("%sd" + "%02dh", days, hours);
+        if(hours != 0)
+            return String.format("%sh" + "%02dm", hours, minutes);
+        if(minutes != 0)
+            return String.format("%sm" + "%02ds", minutes, seconds);
+        if(seconds != 0)
+            return String.format("%s.%03ds", seconds, milliseconds);
+        return milliseconds + "ms";
     }
 }
